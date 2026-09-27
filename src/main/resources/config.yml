@@ -1,0 +1,61 @@
+# NexusArcanum -- a massive overhaul of the vanilla enchanting table.
+#
+# This plugin discards vanilla's own three offers entirely and replaces them with its own,
+# computed from a table's real "resonance": real bookshelf count (same real ring vanilla itself
+# checks), plus a bonus for real chiseled bookshelves (a real 1.20+ block vanilla's own table
+# completely ignores), plus a bonus for a balanced, symmetric bookshelf arrangement. Higher
+# resonance raises both the level-cost ceiling (replacing vanilla's flat 30) and which of the five
+# rarity tiers (Common/Uncommon/Rare/Epic/Mythic) an offer can reach -- reaching a tier never
+# guarantees it, it only makes it possible. Which specific enchantments belong to which tier, and
+# which item categories each enchantment can land on, are fixed in the plugin itself
+# (EnchantCatalog), not here -- same "shared numbers in config, game-balance data in code" split
+# NexusWands already established for its wand woods/cores.
+
+enabled: true
+
+resonance:
+  # Denominator the raw score is divided by to get a 0.0-1.0 resonance fraction. 15 real
+  # bookshelves alone already gets partway there; chiseled bookshelves and symmetry are what push
+  # a dedicated build the rest of the way.
+  max-score: 20.0
+  # How many resonance points one filled slot in a real chiseled bookshelf is worth (it has 6
+  # slots; a fully-stocked one is worth 6x this).
+  chiseled-slot-points: 0.25
+  # How many resonance points each of the four matched opposing direction pairs is worth.
+  symmetry-pair-points: 0.5
+  # Even a table with zero bookshelves still offers *something*, matching vanilla's own
+  # always-offers-1-3 behavior at zero shelves.
+  min-fraction: 0.05
+
+# The resonance fraction (0.0-1.0) at or above which each tier becomes reachable at all. COMMON is
+# always reachable. Reaching a tier only makes it *possible* to roll -- see EnchantCatalog's own
+# fixed per-tier roll weights for how rare it stays even once unlocked.
+tier-thresholds:
+  uncommon: 0.15
+  rare: 0.35
+  epic: 0.65
+  mythic: 0.90
+
+level-cost:
+  # Replaces vanilla's flat 30-at-15-shelves ceiling. A fully resonant table can ask for much more
+  # than vanilla ever would -- and grant much more in return.
+  ceiling: 50
+  # The three offer slots' base fraction of the current ceiling, low/mid/high -- same "three
+  # buttons, cheap/medium/expensive" shape vanilla itself shows.
+  slot-fractions: [0.3, 0.6, 1.0]
+
+multi-enchant:
+  # Odds of an Epic-tier offer actually landing 2 enchantments instead of falling back to 1.
+  epic-second-chance: 0.5
+  # Odds of a Mythic-tier offer landing at least 2.
+  mythic-second-chance: 0.8
+  # Given it already landed 2, the odds of a Mythic-tier offer pushing to a full 3.
+  mythic-third-chance: 0.35
+
+curses:
+  # Off by default. Both real vanilla curses (Vanishing/Binding) are in the catalog at Mythic --
+  # turning this on lets a Mythic offer occasionally carry one along as a wildcard risk, with a
+  # message to the player after the fact (curses give no vanilla warning before you commit).
+  allowed: false
+  # Odds a Mythic-tier offer carries a curse along, only checked when allowed is true.
+  mythic-chance: 0.15
